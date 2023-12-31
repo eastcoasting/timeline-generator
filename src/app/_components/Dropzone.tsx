@@ -71,8 +71,6 @@ export const DropzoneDialog = (): JSX.Element => {
               }
             };
             reader.readAsText(file);
-
-            reader.readAsText(file);
           }),
       ),
     )
