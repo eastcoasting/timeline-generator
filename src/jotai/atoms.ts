@@ -6,7 +6,6 @@ export const timelineAtom = atom<
       startLng: number;
       endLat: number;
       endLng: number;
-      color: (string | undefined)[];
     }[]
   | undefined
 >(undefined);
