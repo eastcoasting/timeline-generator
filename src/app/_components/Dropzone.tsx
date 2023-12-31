@@ -147,12 +147,16 @@ export const DropzoneDialog = (): JSX.Element => {
                       Google Takeout
                     </a>
                   </li>
-                  <li>Unzipping the file</li>
-                  <li>
-                    Dragging or dropping a monthly, or series of months of
-                    activity data.
-                  </li>
+                  <li>Unzipping the files to find folders of annual data</li>
+                  <li>Upload a month, or series of months of activity data.</li>
                 </ol>
+                <div className="flex flex-col py-4">
+                  Example path to data within the Google Takeout folder:
+                  <kbd className="bg-background tracking-tighter mr-1 rounded-lg border font-mono border-gray-200 px-2 py-1 text-xs font-semibold">
+                    Location History (Timeline) / Semantic Location History /
+                    2023_DECEMBER.json)
+                  </kbd>
+                </div>
               </div>
             </DialogDescription>
             <div
