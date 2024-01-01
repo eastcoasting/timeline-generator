@@ -102,7 +102,6 @@ export const DropzoneDialog = (): JSX.Element => {
 
           setTimeline(allData);
           setTimelineDateRange(rangeString ?? null);
-          console.log(rangeString);
         }
       })
       .catch((error) => {

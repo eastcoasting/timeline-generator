@@ -34,7 +34,6 @@ export const Map = (): JSX.Element => {
         color: [mapOptions.arcColor, mapOptions.arcColor],
       }));
 
-      console.log(arcsData);
       setArcData(arcsData);
     } else {
       setArcData(undefined);
