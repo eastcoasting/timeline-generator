@@ -11,10 +11,8 @@ import { useAtom } from "jotai";
 import { ColorPicker } from "./ColorPicker";
 import { mapOptionsAtom, hideControlsAtom } from "@/jotai/atoms";
 
-interface Props {}
 
-export const MapControls = (props: Props): JSX.Element => {
-  const {} = props;
+export const MapControls = (): JSX.Element => {
 
   const [mapOptions, setMapOptions] = useAtom(mapOptionsAtom);
   const [hideControls, setHideControls] = useAtom(hideControlsAtom);
