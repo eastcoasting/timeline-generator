@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { timelineAtom, timelineDateRangeAtom } from "@/jotai/atoms";
+import { timelineAtom, timelineDateRangeAtom, hideControlsAtom } from "@/jotai/atoms";
 import { useAtom } from "jotai";
 
 import React, { useCallback, useState } from "react";
@@ -21,9 +21,9 @@ import { useDropzone } from "react-dropzone";
 export const DropzoneDialog = (): JSX.Element => {
   const [dialogOpenState, setDialogOpenState] = useState(true);
   const [timeline, setTimeline] = useAtom(timelineAtom);
-  const [timelineDateRange, setTimelineDateRange] = useAtom(
-    timelineDateRangeAtom,
-  );
+  const [hideControls, setHideControls] = useAtom(hideControlsAtom);
+
+  const [, setTimelineDateRange] = useAtom(timelineDateRangeAtom);
 
   const { isDragActive } = useDropzone();
 
@@ -112,89 +112,88 @@ export const DropzoneDialog = (): JSX.Element => {
 
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
   return (
-    <div className="">
-      <Dialog
-        open={dialogOpenState}
-        onOpenChange={setDialogOpenState}
-        modal={false}
-      >
-        <DialogTrigger className="absolute left-10 top-10 z-50" asChild>
-          <Button
-            size={"lg"}
-            variant={"outline"}
-            className={`text-black  ${
-              dialogOpenState ? "invisible" : "visible"
+    <Dialog
+      open={dialogOpenState}
+      onOpenChange={(value) => {
+        setDialogOpenState(value);
+        setHideControls(value);
+      }}
+      modal={false}
+    >
+      <DialogTrigger className="absolute left-10 top-10 z-50" asChild>
+        <Button
+          size={"sm"}
+          variant={"outline"}
+          className={`text-black  ${dialogOpenState ? "invisible" : "visible"}`}
+        >
+          {timeline === undefined ? "Add Data" : "Edit Data"}
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Upload a local timeline file.</DialogTitle>
+          <DialogDescription className="my-4" asChild>
+            <div>
+              This should be a .json file downloaded from Google Takeout. This
+              can be found by:
+              <ol className="list-inside list-decimal indent-4">
+                <li>
+                  Downloading data from{" "}
+                  <a
+                    href="https://takeout.google.com/settings/takeout"
+                    target="_blank"
+                    className="text-[#3AA99F]"
+                  >
+                    Google Takeout
+                  </a>
+                </li>
+                <li>Unzipping the files to find folders of annual data</li>
+                <li>Upload a month, or series of months of activity data.</li>
+              </ol>
+              <div className="flex flex-col py-4">
+                Example path to data within the Google Takeout folder:
+                <kbd className="bg-background mr-1 rounded-lg border border-gray-200 px-2 py-1 font-mono text-xs font-semibold tracking-tighter">
+                  Location History (Timeline) / Semantic Location History /
+                  2023_DECEMBER.json)
+                </kbd>
+              </div>
+            </div>
+          </DialogDescription>
+          <div
+            {...getRootProps()}
+            className={`rounded-md p-20 text-center text-base outline-dashed outline-2 outline-[#879A39] transition-all hover:cursor-pointer hover:bg-[#4385BE]/20 ${
+              isDragActive ? "bg-[#4385BE]/50" : "bg-[#4385BE]/10"
             }`}
           >
-            {timeline === undefined ? "Add Data" : "Edit Data"}
-          </Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Upload a local timeline file.</DialogTitle>
-            <DialogDescription className="my-4" asChild>
-              <div>
-                This should be a .json file downloaded from Google Takeout. This
-                can be found by:
-                <ol className="list-inside list-decimal indent-4">
-                  <li>
-                    Downloading data from{" "}
-                    <a
-                      href="https://takeout.google.com/settings/takeout"
-                      target="_blank"
-                      className="text-[#3AA99F]"
-                    >
-                      Google Takeout
-                    </a>
-                  </li>
-                  <li>Unzipping the files to find folders of annual data</li>
-                  <li>Upload a month, or series of months of activity data.</li>
-                </ol>
-                <div className="flex flex-col py-4">
-                  Example path to data within the Google Takeout folder:
-                  <kbd className="bg-background tracking-tighter mr-1 rounded-lg border font-mono border-gray-200 px-2 py-1 text-xs font-semibold">
-                    Location History (Timeline) / Semantic Location History /
-                    2023_DECEMBER.json)
-                  </kbd>
-                </div>
-              </div>
-            </DialogDescription>
-            <div
-              {...getRootProps()}
-              className={`rounded-md p-20 text-center text-base outline-dashed outline-2 outline-[#879A39] transition-all hover:cursor-pointer hover:bg-[#4385BE]/20 ${
-                isDragActive ? "bg-[#4385BE]/50" : "bg-[#4385BE]/10"
-              }`}
+            <input {...getInputProps()} />
+            <p>
+              {" "}
+              {isDragActive
+                ? "Drop file to import a timeline"
+                : "Drag and drop a file or click to upload"}
+            </p>
+          </div>
+        </DialogHeader>
+        <DialogClose asChild>
+          <div className="flex justify-between">
+            <Button
+              variant={"destructive"}
+              onClick={(e) => {
+                if (timeline !== undefined) {
+                  setTimeline(undefined);
+                  setTimelineDateRange(null);
+                }
+                e.preventDefault();
+              }}
+              disabled={timeline === undefined}
             >
-              <input {...getInputProps()} />
-              <p>
-                {" "}
-                {isDragActive
-                  ? "Drop file to import a timeline"
-                  : "Drag and drop a file or click to upload"}
-              </p>
-            </div>
-          </DialogHeader>
-          <DialogClose asChild>
-            <div className="flex justify-between">
-              <Button
-                variant={"destructive"}
-                onClick={(e) => {
-                  if (timeline !== undefined) {
-                    setTimeline(undefined);
-                    setTimelineDateRange(null);
-                  }
-                  e.preventDefault();
-                }}
-                disabled={timeline === undefined}
-              >
-                Clear Data
-              </Button>
-              <Button>Close</Button>
-            </div>
-          </DialogClose>
-        </DialogContent>
-      </Dialog>
-    </div>
+              Clear Data
+            </Button>
+            <Button>Close</Button>
+          </div>
+        </DialogClose>
+      </DialogContent>
+    </Dialog>
   );
 };
 

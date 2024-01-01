@@ -1,13 +1,18 @@
 "use client";
 
-import { timelineAtom } from "@/jotai/atoms";
+import { Button } from "@/components/ui/button";
+import { hideControlsAtom, mapOptionsAtom, timelineAtom } from "@/jotai/atoms";
 import { useAtom } from "jotai";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import Globe from "react-globe.gl";
 
 export const Map = (): JSX.Element => {
   const [timeline] = useAtom(timelineAtom);
+  const [mapOptions] = useAtom(mapOptionsAtom);
+  const [hideControls] = useAtom(hideControlsAtom);
+
+  const globeRef = useRef();
 
   const [arcData, setArcData] = useState<
     | {
@@ -21,11 +26,10 @@ export const Map = (): JSX.Element => {
   >(undefined);
 
   useEffect(() => {
-
     if (timeline !== undefined) {
       const arcsData = timeline.map((obs) => ({
         ...obs,
-        color: ["#BC5215", "#BC5215"],
+        color: [mapOptions.arcColor, mapOptions.arcColor],
       }));
 
       console.log(arcsData);
@@ -33,17 +37,45 @@ export const Map = (): JSX.Element => {
     } else {
       setArcData(undefined);
     }
-  }, [timeline]);
+  }, [timeline, mapOptions]);
+
+  const downloadImage = () => {
+    if (globeRef.current) {
+      requestAnimationFrame(() => {
+        if (globeRef.current === undefined) return;
+
+        const renderer = globeRef.current.renderer();
+        renderer.render(globeRef.current.scene(), globeRef.current.camera());
+        const url = renderer.domElement.toDataURL("image/png");
+
+        const link = document.createElement("a");
+        link.download = "globe.png";
+        link.href = url;
+        link.click();
+      });
+    }
+  };
 
   return (
-    <Globe
-      globeImageUrl="//unpkg.com/three-globe/example/img/earth-night.jpg"
-      arcsData={arcData}
-      arcColor={"color"}
-      arcStroke={0.25}
-      // arcDashLength={() => Math.random()}
-      // arcDashGap={() => Math.random()}
-      // arcDashAnimateTime={() => Math.random(x) * 4000 + 500}
-    />
+    <>
+      {hideControls ? null : (
+        <Button
+          className="absolute bottom-10 left-10 z-50"
+          variant={"outline"}
+          size={"sm"}
+          onClick={downloadImage}
+        >
+          Download
+        </Button>
+      )}
+      <Globe
+        ref={globeRef}
+        globeImageUrl={mapOptions.globeImageUrl}
+        arcsData={arcData}
+        arcColor={"color"}
+        arcStroke={0.25}
+        rendererConfig={{ antialias: false }}
+      />
+    </>
   );
 };
